@@ -1,0 +1,35 @@
+{
+  "app": {
+    "name": "HR Платформасы",
+    "welcome": "Қош келдіңіз"
+  },
+  "navigation": {
+    "dashboard": "Басты бет",
+    "vacancies": "Бос орындар",
+    "candidates": "Үміткерлер",
+    "talent_market": "Талант нарығы",
+    "chat": "Чат",
+    "settings": "Баптаулар",
+    "profile": "Профиль"
+  },
+  "actions": {
+    "save": "Сақтау",
+    "cancel": "Болдырмау",
+    "delete": "Жою",
+    "edit": "Өңдеу",
+    "create": "Құру",
+    "search": "Іздеу",
+    "filter": "Сүзгі",
+    "back": "Артқа",
+    "next": "Келесі",
+    "close": "Жабу",
+    "confirm": "Растау"
+  },
+  "common": {
+    "loading": "Жүктелуде...",
+    "error": "Қате",
+    "success": "Сәтті",
+    "no_data": "Деректер жоқ",
+    "required": "Міндетті өріс"
+  }
+}
