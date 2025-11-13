@@ -518,3 +518,295 @@ e9346b7 - feat: initial project setup with FSD architecture
 **Последнее обновление:** 2025-11-13 14:15 UTC
 **Обновил:** Claude (Sonnet 4.5)
 **Следующий шаг:** Supabase Auth, Layout компоненты, роутинг
+
+---
+
+#### 11. shadcn/ui компоненты (2025-11-13)
+
+**Действия:**
+- Установлены базовые компоненты через shadcn CLI:
+  - Button - кнопка с вариантами (default, outline, ghost, destructive)
+  - Input - поле ввода
+  - Card - карточка с header/content/footer
+  - Dialog - модальное окно
+  - Tabs - вкладки
+  - Badge - бейдж/метка
+  - Avatar - аватар пользователя
+  - Label - метка для форм
+  - Sheet - выдвижная панель (для мобильного меню)
+  - Dropdown-Menu - выпадающее меню
+  - Separator - разделитель
+  - Toast - уведомления (с хуком use-toast)
+
+**Файлы:**
+- `src/shared/ui/*.tsx` - 13 компонентов shadcn/ui
+- `src/shared/hooks/use-toast.ts` - хук для toast уведомлений
+- `src/shared/lib/index.ts` - реэкспорт утилит
+
+**Зависимости:**
+- `@radix-ui/react-*` - базовые примитивы для компонентов
+
+---
+
+#### 12. Supabase Auth система (2025-11-13)
+
+**Действия:**
+- Создан `AuthProvider` с полной системой аутентификации:
+  - Определение ролей (hr_specialist, candidate)
+  - Загрузка профилей из БД (HR или Candidate)
+  - Автоматическое обновление сессий
+  - Хук `useAuth` для доступа к auth контексту
+- Реализованы методы:
+  - `signIn(email, password)` - вход
+  - `signUp(email, password, role, userData)` - регистрация
+  - `signOut()` - выход
+  - `refreshUser()` - обновление данных пользователя
+- Интеграция с Supabase Auth:
+  - Персистентность сессий
+  - Автоматическое обновление токенов
+  - Обработка auth state changes
+
+**Файлы:**
+- `src/app/providers/auth-provider.tsx` - AuthProvider и useAuth
+- `src/shared/types/user.types.ts` - типы пользователей (User, HRSpecialist, Candidate, Organization, AuthUser)
+
+**Особенности:**
+- Загрузка профиля и организации для HR
+- Загрузка профиля для кандидата
+- Автоматическое определение роли
+- Loading states для UX
+
+---
+
+#### 13. React Router и защищенные маршруты (2025-11-13)
+
+**Действия:**
+- Настроен React Router v7 с createBrowserRouter
+- Создан компонент `ProtectedRoute`:
+  - Проверка аутентификации
+  - Проверка ролей (allowedRoles)
+  - Проверка прав владельца организации (requireOwner)
+  - Автоматические редиректы
+  - Loading состояние
+- Определены все маршруты:
+  - Публичные: `/`, `/auth/login`, `/auth/register/*`
+  - HR: `/hr/dashboard`, `/hr/vacancies`, `/hr/candidates`, `/hr/talent-market`, `/hr/chat`, `/hr/organization`
+  - Candidate: `/candidate/dashboard`, `/candidate/tests`, `/candidate/profile`, `/candidate/chat`
+
+**Файлы:**
+- `src/app/router/index.tsx` - конфигурация роутера
+- `src/app/router/protected-route.tsx` - защищенный маршрут
+
+**Охрана маршрутов:**
+- HR routes - только для hr_specialist
+- Candidate routes - только для candidate
+- Organization settings - только для owner
+
+---
+
+#### 14. Layout компоненты (2025-11-13)
+
+**Действия:**
+
+**AuthLayout:**
+- Простой layout для страниц авторизации
+- Логотип + название приложения в header
+- Центрированный контент
+- Footer с копирайтом
+
+**DashboardLayout:**
+- Header с:
+  - Мобильное меню (hamburger)
+  - Логотип/название организации (white-label)
+  - Баланс токенов (только для HR)
+  - Theme Toggle
+  - User Menu (dropdown)
+- Sidebar (desktop) с:
+  - Навигация по разделам
+  - Иконки от lucide-react
+  - Индикатор активной страницы
+  - Адаптивная навигация для HR/Candidate
+- Mobile Sidebar через Sheet компонент
+- Main content area с контейнером
+
+**Header компонент:**
+- White-label поддержка (логотип + название организации)
+- Token Balance display для HR
+- Theme Toggle
+- User Dropdown Menu с профилем и выходом
+
+**Sidebar компонент:**
+- Разная навигация для HR и Candidate
+- Активный пункт меню
+- Иконки для каждого раздела
+- Поддержка badges (будущее)
+
+**Файлы:**
+- `src/widgets/layouts/auth-layout.tsx` - layout для auth страниц
+- `src/widgets/layouts/dashboard-layout.tsx` - layout для dashboard'ов
+- `src/widgets/header/header.tsx` - компонент шапки
+- `src/widgets/sidebar/sidebar.tsx` - компонент сайдбара
+
+---
+
+#### 15. Страницы приложения (2025-11-13)
+
+**Действия:**
+
+**Страница авторизации (`/auth/login`):**
+- Tabs с 3 вкладками:
+  1. Sign In - вход в систему
+  2. HR Sign Up - регистрация HR специалиста с созданием организации
+  3. Candidate Sign Up - регистрация кандидата
+- Формы с валидацией:
+  - Email (required, type=email)
+  - Password (required, minLength=6)
+  - Full Name (для регистрации)
+  - Organization Name (для HR регистрации)
+- Error handling с отображением ошибок
+- Loading states
+- Интеграция с AuthProvider
+
+**HR Dashboard (placeholder):**
+- Welcome секция
+- Stats Cards (4 карточки):
+  - Total Candidates
+  - Active Vacancies
+  - Token Balance
+  - Unread Messages
+- Recent Activity секция (пока пустая)
+
+**Candidate Dashboard (placeholder):**
+- Welcome Banner (градиент)
+- Profile Completeness с прогресс-баром
+- Tests Status (6 тестов)
+- Recent Activity
+
+**Файлы:**
+- `src/pages/auth/login-page.tsx` - страница авторизации
+- `src/pages/hr-dashboard/index.tsx` - HR dashboard
+- `src/pages/candidate-dashboard/index.tsx` - Candidate dashboard
+
+---
+
+#### 16. Интеграция провайдеров (2025-11-13)
+
+**Действия:**
+- Обновлен `App.tsx`:
+  - ThemeProvider (оборачивает все)
+  - AuthProvider (внутри ThemeProvider)
+  - RouterProvider (внутри AuthProvider)
+  - Правильная иерархия провайдеров
+- Обновлен `main.tsx`:
+  - Импорт i18n конфигурации
+  - Инициализация i18n при старте
+
+**Файлы:**
+- `src/App.tsx` - обновлен с провайдерами
+- `src/main.tsx` - добавлен импорт i18n
+
+---
+
+#### 17. Git Commit (2025-11-13)
+
+**Действия:**
+- Создан коммит `beb7e83` с полной реализацией auth системы
+- 31 файл изменен, 3607 добавлений, 121 удалений
+
+**Коммит:**
+```
+beb7e83 - feat: implement authentication system and core layouts
+
+- Install shadcn/ui components (Button, Input, Card, Dialog, Tabs, Badge, Avatar, Label, Sheet, Dropdown-Menu, Separator, Toast)
+- Create AuthProvider with useAuth hook for Supabase authentication
+- Implement ProtectedRoute component with role-based access control
+- Create React Router configuration with all routes (HR, Candidate, Auth)
+- Build AuthLayout for auth pages
+- Build DashboardLayout with Header and Sidebar
+- Create Header component with token balance, theme toggle, and user menu
+- Create Sidebar component with role-based navigation
+- Implement LoginPage with tabs (Sign In, HR Registration, Candidate Registration)
+- Create placeholder pages for HR and Candidate dashboards
+- Add user types (HRSpecialist, Candidate, Organization, AuthUser)
+- Create use-toast hook for notifications
+- Update App.tsx with ThemeProvider, AuthProvider, and RouterProvider
+- Initialize i18n in main.tsx
+
+All components follow the design system (Slate theme, New York style)
+Project builds successfully without errors
+```
+
+**Ветка:** `claude/hr-platform-auth-setup-011CV63ysezWXS7P8pYXMJuD`
+
+**Примечание:** Push не удался из-за Internal Server Error на GitHub proxy. Коммит сохранен локально и может быть запушен позже вручную командой:
+```bash
+git push origin claude/hr-platform-auth-setup-011CV63ysezWXS7P8pYXMJuD
+```
+
+---
+
+### 🔄 В ПРОЦЕССЕ
+
+Нет задач в процессе.
+
+---
+
+### ⏳ ОЖИДАЕТ ВЫПОЛНЕНИЯ
+
+#### Следующие задачи Этапа 1:
+
+1. **Supabase Backend (миграции) - ПРИОРИТЕТ**
+   - Создать все таблицы из ТЗ раздел 4.1:
+     - organizations
+     - hr_specialists
+     - professional_categories
+     - candidates
+     - candidate_skills
+     - skills_dictionary
+     - invitation_tokens
+     - org_invitation_tokens
+     - vacancies
+     - applications
+     - test_results
+     - test_questions (если нужно)
+     - ai_analysis_results
+     - messages
+     - ai_models_config
+     - operation_costs
+   - Настроить RLS политики (раздел 4.2)
+   - Создать Storage bucket для логотипов
+   - Создать RPC функции и триггеры:
+     - Триггер создания профиля после регистрации
+     - Триггер выдачи 1000 токенов новой организации
+     - Функция обновления token_balance
+     - Функция поиска по словарю навыков
+   - Заполнить начальные данные:
+     - professional_categories (13 категорий на 3 языках)
+     - ai_models_config
+     - operation_costs
+
+2. **Тестирование базового функционала**
+   - Проверить запуск dev сервера
+   - Проверить сборку проекта (уже сделано - успешно)
+   - Проверить переключение тем
+   - Проверить переключение языков
+   - После миграций:
+     - Проверить регистрацию HR → создание организации → 1000 токенов
+     - Проверить регистрацию кандидата
+     - Проверить вход/выход
+     - Проверить защищенные роуты
+     - Проверить адаптивность от 320px
+
+3. **Улучшения и доработки (опционально для Этапа 1)**
+   - Страница восстановления пароля
+   - Страница регистрации по invite token
+   - Страница регистрации HR по org invite token
+   - Добавить реальные переводы в i18n файлы
+   - Тосты для успешных действий (вместо alert)
+   - Валидация форм через Zod + React Hook Form
+
+---
+
+**Последнее обновление:** 2025-11-13 14:45 UTC
+**Обновил:** Claude (Sonnet 4.5)
+**Следующий шаг:** Supabase миграции (создание всех таблиц)
