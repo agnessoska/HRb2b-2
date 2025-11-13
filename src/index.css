@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Mode Colors - Slate */
+    --background: 0 0% 100%; /* #ffffff */
+    --foreground: 222.2 84% 4.9%; /* #0f172a - slate-900 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 217.2 91.2% 59.8%; /* #3b82f6 - blue-500 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96.1%; /* #f1f5f9 - slate-100 */
+    --secondary-foreground: 222.2 47.4% 11.2%; /* #1e293b - slate-800 */
+
+    --muted: 210 40% 96.1%; /* #f1f5f9 - slate-100 */
+    --muted-foreground: 215.4 16.3% 46.9%; /* #64748b - slate-500 */
+
+    --accent: 210 40% 96.1%; /* #f1f5f9 - slate-100 */
+    --accent-foreground: 222.2 47.4% 11.2%; /* #1e293b - slate-800 */
+
+    --destructive: 0 84.2% 60.2%; /* #ef4444 - red-500 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214.3 31.8% 91.4%; /* #e2e8f0 - slate-200 */
+    --input: 214.3 31.8% 91.4%; /* #e2e8f0 - slate-200 */
+    --ring: 217.2 91.2% 59.8%; /* #3b82f6 - blue-500 */
+
+    --radius: 0.5rem; /* 8px - rounded-lg */
+  }
+
+  .dark {
+    /* Dark Mode Colors - Slate */
+    --background: 222.2 84% 4.1%; /* #0a0e1a - darker than slate-900 */
+    --foreground: 210 40% 98%; /* #f8fafc - slate-50 */
+
+    --card: 222.2 84% 4.9%; /* #0f172a - slate-900 */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217.2 91.2% 67.8%; /* #60a5fa - blue-400 (lighter for dark) */
+    --primary-foreground: 222.2 84% 4.9%;
+
+    --secondary: 222.2 47.4% 11.2%; /* #1e293b - slate-800 */
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 222.2 47.4% 11.2%; /* #1e293b - slate-800 */
+    --muted-foreground: 215 20.2% 65.1%; /* #94a3b8 - slate-400 */
+
+    --accent: 222.2 47.4% 11.2%; /* #1e293b - slate-800 */
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84.2% 70%; /* #f87171 - red-400 (lighter for dark) */
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 222.2 47.4% 11.2%; /* #1e293b - slate-800 */
+    --input: 222.2 47.4% 11.2%;
+    --ring: 217.2 91.2% 67.8%; /* #60a5fa - blue-400 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.25;
+  }
+}
+
+@layer utilities {
+  /* Custom scrollbar */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-secondary;
+    border-radius: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30;
+    border-radius: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
