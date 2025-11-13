@@ -147,7 +147,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     userRole: UserRole,
     userData: any
   ) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -159,9 +159,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (error) throw error;
+    if (!data.user) throw new Error('User creation failed');
 
-    // Note: Actual profile creation will be handled by Supabase trigger
-    // after email confirmation
+    // Create profile based on role
+    try {
+      if (userRole === 'hr_specialist') {
+        const { error: profileError } = await supabase.rpc('create_hr_specialist_profile', {
+          p_user_id: data.user.id,
+          p_email: email,
+          p_full_name: userData.full_name,
+          p_organization_name: userData.organization_name,
+        });
+
+        if (profileError) throw profileError;
+      } else if (userRole === 'candidate') {
+        const { error: profileError } = await supabase.rpc('create_candidate_profile', {
+          p_user_id: data.user.id,
+          p_email: email,
+          p_full_name: userData.full_name,
+        });
+
+        if (profileError) throw profileError;
+      }
+
+      // Load the newly created profile
+      await loadUserProfile(data.user.id, email);
+    } catch (profileError: any) {
+      // If profile creation fails, delete the auth user to maintain consistency
+      console.error('Profile creation failed:', profileError);
+      // Note: Can't easily delete the user here, so we'll throw the error
+      throw new Error(`Profile creation failed: ${profileError.message}`);
+    }
   };
 
   // Sign out

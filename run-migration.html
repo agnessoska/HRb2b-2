@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Migration Runner</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+    #log {
+      margin-top: 20px;
+      padding: 15px;
+      background: #1f2937;
+      color: #10b981;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .error {
+      color: #ef4444;
+    }
+    .success {
+      color: #10b981;
+    }
+    .info {
+      color: #60a5fa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 Supabase Migration Runner</h1>
+    <p>Click the button below to run the database migration.</p>
+    <p><strong>This will:</strong></p>
+    <ul>
+      <li>Create all database tables</li>
+      <li>Set up Row Level Security policies</li>
+      <li>Create helper functions</li>
+      <li>Seed initial data (categories, AI models, operation costs)</li>
+    </ul>
+
+    <button id="runBtn" onclick="runMigration()">Run Migration</button>
+
+    <div id="log"></div>
+  </div>
+
+  <script type="module">
+    const SUPABASE_URL = 'https://obcpynzcyjcdxconyzjm.supabase.co';
+    const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9iY3B5bnpjeWpjZHhjb255emptIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2Mjk0NjA1MSwiZXhwIjoyMDc4NTIyMDUxfQ.PmEMpiFGw4onbDJ1Rfyrk2q84-3CdRzQs2_yXPXCWxs';
+
+    let logElement;
+
+    function log(message, type = 'info') {
+      if (!logElement) {
+        logElement = document.getElementById('log');
+      }
+      const timestamp = new Date().toLocaleTimeString();
+      const className = type === 'error' ? 'error' : (type === 'success' ? 'success' : 'info');
+      logElement.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+      logElement.scrollTop = logElement.scrollHeight;
+    }
+
+    window.runMigration = async function() {
+      const btn = document.getElementById('runBtn');
+      btn.disabled = true;
+      logElement = document.getElementById('log');
+      logElement.innerHTML = '';
+
+      try {
+        log('📖 Fetching migration file...', 'info');
+
+        const response = await fetch('./supabase/migrations/combined_migration_fixed.sql');
+        if (!response.ok) {
+          throw new Error(`Failed to load migration file: ${response.status}`);
+        }
+
+        const migrationSQL = await response.text();
+        log(`✅ Loaded migration (${migrationSQL.length} characters)`, 'success');
+
+        log('🔌 Connecting to Supabase...', 'info');
+
+        // Execute SQL directly using fetch
+        const dbResponse = await fetch(`${SUPABASE_URL}/rest/v1/rpc/exec`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_SERVICE_KEY,
+            'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`
+          },
+          body: JSON.stringify({ query: migrationSQL })
+        });
+
+        if (!dbResponse.ok) {
+          const errorText = await dbResponse.text();
+          throw new Error(`Database error: ${errorText}`);
+        }
+
+        log('✅ Migration completed successfully!', 'success');
+        log('', 'info');
+        log('📊 Next steps:', 'info');
+        log('1. Close this page', 'info');
+        log('2. Open http://localhost:5173', 'info');
+        log('3. Try registering as HR or Candidate', 'info');
+        log('4. All features should work now!', 'info');
+
+        btn.textContent = '✅ Migration Complete!';
+        btn.style.background = '#10b981';
+
+      } catch (error) {
+        log(`❌ Error: ${error.message}`, 'error');
+        console.error('Full error:', error);
+        btn.disabled = false;
+        btn.textContent = 'Retry Migration';
+      }
+    };
+  </script>
+</body>
+</html>
