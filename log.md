@@ -810,3 +810,216 @@ git push origin claude/hr-platform-auth-setup-011CV63ysezWXS7P8pYXMJuD
 **Последнее обновление:** 2025-11-13 14:45 UTC
 **Обновил:** Claude (Sonnet 4.5)
 **Следующий шаг:** Supabase миграции (создание всех таблиц)
+
+---
+
+#### 18. Supabase Database Migrations (2025-11-13)
+
+**Действия:**
+Созданы 6 SQL миграций со всеми таблицами, триггерами, функциями и RLS политиками:
+
+**1. Initial Schema (20251113000001_initial_schema.sql):**
+- Таблицы: `organizations`, `hr_specialists`, `professional_categories`
+- 13 профессиональных категорий на 3 языках (ru, kk, en)
+- Триггеры для auto-update `updated_at`
+- Индексы для оптимизации запросов
+
+**2. Candidates Schema (20251113000002_candidates_schema.sql):**
+- Таблицы: `candidates`, `candidate_skills`, `skills_dictionary`
+- Функция `search_skill()` для поиска навыков в словаре
+- Индексы для быстрого поиска по навыкам
+
+**3. Vacancies Schema (20251113000003_vacancies_schema.sql):**
+- Таблицы: `vacancies`, `applications`, `invitation_tokens`, `org_invitation_tokens`
+- Функция `generate_invitation_token()` для создания токенов
+- Статусы заявок: invited → registered → testing → tested → analyzed → interview → offer → hired/rejected
+- JSONB поле для ideal_profile (AI-генерация)
+
+**4. Tests and AI Schema (20251113000004_tests_and_ai_schema.sql):**
+- Таблицы: `test_results`, `ai_analysis_results`, `messages`, `ai_models_config`, `operation_costs`
+- 6 типов психометрических тестов
+- Настройки AI моделей (Claude, GPT, Gemini)
+- Фиксированные стоимости операций в токенах
+- Seed data: 6 AI моделей, 4 типа операций
+
+**5. Auth Triggers (20251113000005_auth_triggers.sql):**
+- Функция `create_hr_profile()` - создает организацию и профиль HR после регистрации
+- Функция `create_candidate_profile()` - создает профиль кандидата после регистрации
+- Триггеры на `auth.users` для автоматического создания профилей
+- Функция `calculate_profile_completeness()` - считает процент заполнения профиля (0-100%)
+- Триггер для auto-update `profile_completeness` при изменении профиля
+- Функции `deduct_tokens()` и `add_tokens()` для управления балансом токенов
+- **ВАЖНО:** Новая организация автоматически получает 1000 токенов
+
+**6. RLS Policies (20251113000006_rls_policies.sql):**
+- RLS включен для ВСЕХ таблиц
+- Helper functions для проверки ролей:
+  - `auth.user_organization_id()` - ID организации текущего пользователя
+  - `auth.is_hr()` - проверка, является ли пользователь HR
+  - `auth.is_candidate()` - проверка, является ли пользователь кандидатом
+  - `auth.is_org_owner()` - проверка, является ли пользователь владельцем организации
+- Политики для каждой таблицы:
+  - HR видит только данные своей организации
+  - Кандидаты видят только свои данные
+  - Публичные кандидаты видны всем HR в Talent Market
+  - Владельцы организации имеют дополнительные права
+
+**Файлы:**
+- `supabase/migrations/20251113000001_initial_schema.sql` - 173 строки
+- `supabase/migrations/20251113000002_candidates_schema.sql` - 160 строк
+- `supabase/migrations/20251113000003_vacancies_schema.sql` - 241 строк
+- `supabase/migrations/20251113000004_tests_and_ai_schema.sql` - 252 строки
+- `supabase/migrations/20251113000005_auth_triggers.sql` - 214 строк
+- `supabase/migrations/20251113000006_rls_policies.sql` - 345 строк
+- `supabase/migrations/combined_migration.sql` - 1112 строк (объединенный файл)
+
+**Особенности:**
+- Все таблицы с UUID первичными ключами
+- Все таблицы с `created_at` и `updated_at` (где нужно)
+- Автоматическое обновление `updated_at` через триггеры
+- Cascading deletes где необходимо
+- CHECK constraints для валидации данных
+- UNIQUE constraints для предотвращения дубликатов
+- Индексы для всех foreign keys и часто используемых полей
+- JSONB поля для гибкого хранения структурированных данных
+- Комментарии ко всем таблицам и важным колонкам
+
+**Seed Data (уже включены в миграции):**
+- 13 профессиональных категорий (IT, Маркетинг, Продажи, Финансы и т.д.)
+- 6 AI моделей (Claude 3.5 Sonnet/Haiku, GPT-4o/mini, Gemini 1.5 Pro/Flash)
+- 4 типа операций с фиксированной стоимостью
+
+---
+
+#### 19. Git Commit - Migrations (2025-11-13)
+
+**Действия:**
+- Создан коммит `2e8fc3f` с полными миграциями БД
+- 7 файлов, 2224 строки SQL
+
+**Коммит:**
+```
+2e8fc3f - feat: create Supabase database migrations
+
+- Initial schema: organizations, hr_specialists, professional_categories
+- Candidates schema: candidates, candidate_skills, skills_dictionary
+- Vacancies schema: vacancies, applications, invitation_tokens
+- Tests and AI schema: test_results, ai_analysis_results, messages
+- Auth triggers: auto-create profiles, token distribution
+- RLS policies: row-level security for all tables
+- Helper functions: deduct_tokens, add_tokens, search_skill, etc.
+- Seed data: 13 professional categories, AI models config, operation costs
+
+Total: 6 migration files + 1 combined file
+All tables, triggers, functions, and RLS policies included
+```
+
+**Ветка:** `claude/hr-platform-auth-setup-011CV63ysezWXS7P8pYXMJuD`
+**Push:** ✅ Успешно
+
+---
+
+### 📝 КАК ЗАДЕПЛОИТЬ МИГРАЦИИ
+
+**Вариант 1: Через Supabase Dashboard (РЕКОМЕНДУЕТСЯ)**
+
+1. Открой https://supabase.com/dashboard
+2. Выбери свой проект `obcpynzcyjcdxconyzjm`
+3. Перейди в **SQL Editor**
+4. Открой файл `supabase/migrations/combined_migration.sql` локально
+5. Скопируй весь SQL код
+6. Вставь в SQL Editor и нажми **RUN**
+7. Подожди ~10-30 секунд (выполнится 1112 строк SQL)
+8. Готово! ✅
+
+**Вариант 2: Через Supabase CLI (если установлен)**
+
+```bash
+# Если CLI установлен
+supabase link --project-ref obcpynzcyjcdxconyzjm
+supabase db push
+```
+
+**Вариант 3: Через psql напрямую**
+
+```bash
+# Если хочешь через psql
+PGPASSWORD=xjvBkt9PDUFJOioP psql \
+  -h db.obcpynzcyjcdxconyzjm.supabase.co \
+  -U postgres \
+  -d postgres \
+  -f supabase/migrations/combined_migration.sql
+```
+
+**Проверка после деплоя:**
+
+1. Открой **Table Editor** в Supabase Dashboard
+2. Должны появиться все таблицы:
+   - organizations
+   - hr_specialists
+   - professional_categories (с 13 записями)
+   - candidates
+   - candidate_skills
+   - skills_dictionary
+   - vacancies
+   - applications
+   - invitation_tokens
+   - org_invitation_tokens
+   - test_results
+   - ai_analysis_results
+   - messages
+   - ai_models_config (с 6 записями)
+   - operation_costs (с 4 записями)
+
+3. Проверь **Database > Functions** - должны появиться функции
+4. Проверь **Database > Triggers** - должны быть триггеры на auth.users
+
+**Если возникнут ошибки:**
+- Скопируй текст ошибки
+- Проверь, что база пустая (нет конфликтующих таблиц)
+- Можно выполнять миграции по одной (файлы пронумерованы)
+
+---
+
+### 🔄 В ПРОЦЕССЕ
+
+Нет задач в процессе.
+
+---
+
+### ⏳ ОЖИДАЕТ ВЫПОЛНЕНИЯ
+
+#### Следующие задачи Этапа 1:
+
+1. **Тестирование базового функционала - ПРИОРИТЕТ**
+   - Задеплоить миграции на Supabase (инструкция выше)
+   - Запустить dev сервер: `npm run dev`
+   - Проверить регистрацию HR:
+     - Ввести email, password, имя, название организации
+     - После регистрации должна создаться организация
+     - Организация должна получить 1000 токенов
+     - Должен создаться профиль HR с ролью 'owner'
+   - Проверить регистрацию кандидата:
+     - Ввести email, password, имя
+     - Должен создаться профиль кандидата
+     - profile_completeness должен быть 20%
+   - Проверить вход/выход
+   - Проверить переключение тем (light/dark)
+   - Проверить переключение языков (ru/kk/en)
+   - Проверить защищенные роуты (HR не может зайти в /candidate, и наоборот)
+   - Проверить адаптивность от 320px
+   - Проверить баланс токенов в header для HR
+
+2. **Улучшения и доработки (опционально для Этапа 1)**
+   - Страница восстановления пароля
+   - Страница регистрации по invite token
+   - Страница регистрации HR по org invite token
+   - Добавить реальные переводы в i18n файлы
+   - Тосты для успешных действий (вместо alert)
+   - Валидация форм через Zod + React Hook Form
+
+---
+
+**Последнее обновление:** 2025-11-13 15:30 UTC
+**Обновил:** Claude (Sonnet 4.5)
+**Следующий шаг:** Деплой миграций + тестирование регистрации и авторизации
