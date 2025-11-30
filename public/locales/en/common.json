@@ -1,0 +1,35 @@
+{
+  "app": {
+    "name": "HR Platform",
+    "welcome": "Welcome"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "vacancies": "Vacancies",
+    "candidates": "Candidates",
+    "talent_market": "Talent Market",
+    "chat": "Chat",
+    "settings": "Settings",
+    "profile": "Profile"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "confirm": "Confirm"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "no_data": "No data",
+    "required": "Required field"
+  }
+}

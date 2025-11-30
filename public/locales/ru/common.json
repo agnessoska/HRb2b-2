@@ -1,0 +1,35 @@
+{
+  "app": {
+    "name": "HR Платформа",
+    "welcome": "Добро пожаловать"
+  },
+  "navigation": {
+    "dashboard": "Главная",
+    "vacancies": "Вакансии",
+    "candidates": "Кандидаты",
+    "talent_market": "Рынок талантов",
+    "chat": "Чат",
+    "settings": "Настройки",
+    "profile": "Профиль"
+  },
+  "actions": {
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "create": "Создать",
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "back": "Назад",
+    "next": "Далее",
+    "close": "Закрыть",
+    "confirm": "Подтвердить"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "no_data": "Нет данных",
+    "required": "Обязательное поле"
+  }
+}
